@@ -21,18 +21,19 @@ app.get('/', function(req, res){
 
 app.get('/addJob', function(req, res){
     var url = req.query.url;
-    console.log(url);
     var id = JobQueue.addJob(new JobQueue.Job(url));
     //respond with id
     res.send(id);
 });
 
 app.get('/checkStatus', function(req, res){
-    res.send('hello world');
+    var id = req.query.id;
+    var status = JobQueue.checkStatus(id);
+    res.send(status);
 });
 
 
-console.log("redi")
+console.log("redi to rumble!!!! on port " + port);
 app.listen(port);
 
 

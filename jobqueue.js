@@ -1,9 +1,10 @@
 
 var request = require('request');
 statusEnum = {
-    ready: "ready, not yet started",
+    ready: "in queue",
     inProgress : "job in progress",
-    finished : "job finished"
+    finished : "job finished",
+    doesNotExist : "job does not exist"
 };
 
 //queue definition
@@ -11,18 +12,25 @@ var queue = [];
 queue.jobByID = {};
 
 queue.addJob = function (job) {
-    job.addListener(function(status){
+    function callback(status){
         if (status == statusEnum.finished) {
-            queue.Next();
+            queue.next();
         }
-    });
-    var id = Math.random().toString( 36 ).substr( 2 );
+    }
+    job.addListener(callback);
+    var id = Math.random().toString(36).substr(2);
     queue.jobByID[id] = job;
     queue.push(job);
+    if (queue.length == 1) {
+        queue.next();
+    }
     return id;
 }
 queue.checkStatus = function (id) {
-    return queue.jobByID[id].status;
+    var job = queue.jobByID[id];
+    if (job != null) {
+        return queue.jobByID[id].status;
+    } else return statusEnum.jobByID.doesNotExist;
 }
 
 //initial kick of when queue !empty and nothing running, then called when current job is finished
@@ -55,24 +63,28 @@ function Job(url) {
     //fetch data from a url
     this.run = function(){
         this.status = statusEnum.inProgress;
-        listeners.forEach(function(listener){
-            listener(status);
-        });
+        for (var i = 0; i < this.listeners.length; i++) {
+            this.listeners[i](this.status);
+        }
+        var that = this;
         request(this.url, function(err, res, body) {
             if (err) {
                 console.log(err);
             }
-            console.log(body.url);
-            console.log(body.explanation);
-            this.result = body;
-            this.status = statusEnum.finished;
-            listeners.forEach(function(listener){
-                listener(status);
-            });
+            if (body != null) {
+                console.log(body.url);
+                console.log(body.explanation);
+                that.result = body;
+            }
+            that.status = statusEnum.finished;
+            for (var i = 0; i < that.listeners.length; i++) {
+                that.listeners[i](that.status);
+            }
         });
     };
 
 }
+
 
 queue.Job = Job;
 //variable called status that can be queried and is updated
