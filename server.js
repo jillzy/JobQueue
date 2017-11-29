@@ -32,6 +32,7 @@ app.get('/checkStatus', function(req, res){
     res.send(status);
 });
 
+//TODO: check results
 
 console.log("redi to rumble!!!! on port " + port);
 app.listen(port);

@@ -46,6 +46,7 @@ queue.next = function () {
 
 //job definition
 // TODO: store results in database
+//TODO: Check results
 function Job(url) {
     this.url = url;
     this.status = statusEnum.ready;
@@ -72,6 +73,13 @@ function Job(url) {
                 console.log(err);
             }
             if (body != null) {
+
+                //fetch data from body
+                //store body, job id, url in a row if no error
+                //store to database
+
+                //if error, store url job id and error
+
                 console.log(body.url);
                 console.log(body.explanation);
                 that.result = body;
