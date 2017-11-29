@@ -1,16 +1,21 @@
-const request = require('request');
+
+var request = require('request');
 statusEnum = {
     ready: "ready, not yet started",
     inProgress : "job in progress",
     finished : "job finished"
-}
-
+};
 
 //queue definition
 var queue = [];
 queue.jobByID = {};
 
 queue.addJob = function (job) {
+    job.addListener(function(status){
+        if (status == statusEnum.finished) {
+            queue.Next();
+        }
+    });
     var id = Math.random().toString( 36 ).substr( 2 );
     queue.jobByID[id] = job;
     queue.push(job);
@@ -33,15 +38,26 @@ queue.next = function () {
 
 //job definition
 // TODO: store results in database
-function Job(url, callback) {
+function Job(url) {
     this.url = url;
     this.status = statusEnum.ready;
     this.result = null;
-    this.callback = callback;
+    this.listeners = []; //is called when the status changes
+
+    this.addListener = function(listener){
+        this.listeners.push(listener);
+    }
+
+    this.removeListener = function(listener){
+        this.listeners.remove(listener);
+    }
 
     //fetch data from a url
-    this.run = function run(){
+    this.run = function(){
         this.status = statusEnum.inProgress;
+        listeners.forEach(function(listener){
+            listener(status);
+        });
         request(this.url, function(err, res, body) {
             if (err) {
                 console.log(err);
@@ -50,18 +66,16 @@ function Job(url, callback) {
             console.log(body.explanation);
             this.result = body;
             this.status = statusEnum.finished;
-            if (callback != null) {
-                callback();
-            }
+            listeners.forEach(function(listener){
+                listener(status);
+            });
         });
     };
 
 }
-/*
-User.prototype.sayHi = function() {
-    alert(this.name);
-}*/
 
-//fetchResult ajax
+queue.Job = Job;
 //variable called status that can be queried and is updated
 //url variable
+
+module.exports = queue;
