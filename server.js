@@ -42,7 +42,7 @@ app.get('/addJob', function(req, res){
             .then(function (result) {
                 console.log("finished");
             })
-            
+
 
         }
     }
@@ -71,6 +71,18 @@ app.get('/checkStatus', function(req, res){
 });
 
 //TODO: check results
+app.get('/checkResult', function(req,res){
+    var id = req.query.id;
+
+    db.collection(JobsCollection).findOne(
+        {
+            "_id": id
+        }
+    ).then(function(row) {
+        res.send(row.result)
+    })
+
+});
 
 console.log("redi to rumble!!!! on port " + port);
 app.listen(port);

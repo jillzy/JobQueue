@@ -75,16 +75,6 @@ function Job(url) {
                 that.result = err;
             }
             else if (body != null) {
-
-                //fetch data from body
-                //store body, job id, url in a row if no error
-                //store to database
-
-                //if error, store url job id and error
-
-                //console.log(body);
-                //console.log(body.url);
-                //console.log(body.explanation);
                 that.result = body;
             }
             that.status = statusEnum.finished;
