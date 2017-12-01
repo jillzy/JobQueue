@@ -15,11 +15,15 @@ var port = process.env.PORT || 8080;
 var MongoClient = require('mongodb').MongoClient;
 
 // Connect to the db
-MongoClient.connect("mongodb://localhost:27017/JobDatabase", function(err, db) {
+var db;
+const JobsCollection = "JobCollection";
+MongoClient.connect("mongodb://localhost:27017/JobDatabase", function(err, database) {
     if(!err) {
+        db = database;
         console.log("We are connected");
+
     }
-});
+})
 
 app.get('/', function(req, res){
     res.send('hello world');
@@ -27,7 +31,27 @@ app.get('/', function(req, res){
 
 app.get('/addJob', function(req, res){
     var url = req.query.url;
-    var id = JobQueue.addJob(new JobQueue.Job(url));
+    var job = new JobQueue.Job(url);
+    function callback(status){
+        if (status == statusEnum.finished) {
+            db.runCommand(
+                {
+                    insert: JobsCollection,
+                    documents: [ { id: job.id, url: url, result: job.result } ]
+                }
+            )
+            //store job.id
+            //store url
+            //UPDATE result
+
+        }
+    }
+    job.addListener(callback)
+        //if no error
+        //store job.id
+        //store url
+        //store result
+    var id = JobQueue.addJob(job);
     //respond with id
     res.send(id);
 });

@@ -71,8 +71,9 @@ function Job(url) {
         request(this.url, function(err, res, body) {
             if (err) {
                 console.log(err);
+                that.result = err;
             }
-            if (body != null) {
+            else if (body != null) {
 
                 //fetch data from body
                 //store body, job id, url in a row if no error
