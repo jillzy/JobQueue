@@ -67,7 +67,7 @@ app.get('/checkStatus', function(req, res){
     res.send(status);
 });
 
-//TODO: check results
+
 app.get('/checkResult', function(req,res){
     var id = req.query.id;
 
@@ -77,7 +77,6 @@ app.get('/checkResult', function(req,res){
         }
     ).then(function(row) {
         res.send(row.result)
-        console.log(row.result)
     })
 
 });
