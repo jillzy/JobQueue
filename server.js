@@ -12,8 +12,14 @@ var db = require('./config/db');
 var port = process.env.PORT || 8080;
 
 // connect to our mongoDB database
-// (uncomment after you enter in your own credentials in config/db.js)
-// mongoose.connect(db.url);
+var MongoClient = require('mongodb').MongoClient;
+
+// Connect to the db
+MongoClient.connect("mongodb://localhost:27017/JobDatabase", function(err, db) {
+    if(!err) {
+        console.log("We are connected");
+    }
+});
 
 app.get('/', function(req, res){
     res.send('hello world');
