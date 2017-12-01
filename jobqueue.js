@@ -12,8 +12,8 @@ var queue = [];
 queue.jobByID = {};
 
 queue.addJob = function (job) {
-    function callback(status){
-        if (status == statusEnum.finished) {
+    function callback(job){
+        if (job.status == statusEnum.finished) {
             queue.next();
         }
     }
@@ -48,29 +48,30 @@ queue.next = function () {
 // TODO: store results in database
 //TODO: Check results
 function Job(url) {
+    var that = this;
     this.url = url;
     this.status = statusEnum.ready;
     this.result = null;
     this.listeners = []; //is called when the status changes
 
     this.addListener = function(listener){
-        this.listeners.push(listener);
+        that.listeners.push(listener);
     }
 
     this.removeListener = function(listener){
-        this.listeners.remove(listener);
+        that.listeners.remove(listener);
     }
+
 
     //fetch data from a url
     this.run = function(){
-        this.status = statusEnum.inProgress;
-        for (var i = 0; i < this.listeners.length; i++) {
-            this.listeners[i](this.status);
+        that.status = statusEnum.inProgress;
+        for (var i = 0; i < that.listeners.length; i++) {
+            that.listeners[i](that);
         }
-        var that = this;
-        request(this.url, function(err, res, body) {
+        request(that.url, function(err, res, body) {
             if (err) {
-                console.log(err);
+                //console.log(rr);
                 that.result = err;
             }
             else if (body != null) {
@@ -81,13 +82,14 @@ function Job(url) {
 
                 //if error, store url job id and error
 
-                console.log(body.url);
-                console.log(body.explanation);
+                //console.log(body);
+                //console.log(body.url);
+                //console.log(body.explanation);
                 that.result = body;
             }
             that.status = statusEnum.finished;
             for (var i = 0; i < that.listeners.length; i++) {
-                that.listeners[i](that.status);
+                that.listeners[i](that);
             }
         });
     };

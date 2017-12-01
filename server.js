@@ -31,27 +31,35 @@ app.get('/', function(req, res){
 
 app.get('/addJob', function(req, res){
     var url = req.query.url;
-    var job = new JobQueue.Job(url);
-    function callback(status){
-        if (status == statusEnum.finished) {
-            db.runCommand(
-                {
-                    insert: JobsCollection,
-                    documents: [ { id: job.id, url: url, result: job.result } ]
-                }
+    var newJob = new JobQueue.Job(url);
+    function callback(job) {
+        if (job.status == statusEnum.finished) {
+            console.log(job.id)
+            db.collection(JobsCollection).updateOne(
+                {"_id": job.id},
+                {$set: {"result": job.result, "status": job.status}}
             )
-            //store job.id
-            //store url
-            //UPDATE result
+            .then(function (result) {
+                console.log("finished");
+            })
+            
 
         }
     }
-    job.addListener(callback)
-        //if no error
-        //store job.id
-        //store url
-        //store result
-    var id = JobQueue.addJob(job);
+    newJob.addListener(callback)
+    var id = JobQueue.addJob(newJob);
+    newJob.id = id;
+
+    db.collection(JobsCollection).insertOne({
+        "_id": newJob.id,
+        "url": url,
+        "status": newJob.status,
+        "result": newJob.result
+    })
+    .then(function(result) {
+        console.log();
+    })
+
     //respond with id
     res.send(id);
 });
