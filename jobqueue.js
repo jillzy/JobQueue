@@ -1,4 +1,3 @@
-
 var request = require('request');
 statusEnum = {
     ready: "in queue",
@@ -26,6 +25,7 @@ queue.addJob = function (job) {
     }
     return id;
 }
+
 queue.checkStatus = function (id) {
     var job = queue.jobByID[id];
     if (job != null) {
@@ -45,8 +45,6 @@ queue.next = function () {
 
 
 //job definition
-// TODO: store results in database
-//TODO: Check results
 function Job(url) {
     var that = this;
     this.url = url;
@@ -71,7 +69,6 @@ function Job(url) {
         }
         request(that.url, function(err, res, body) {
             if (err) {
-                //console.log(rr);
                 that.result = err;
             }
             else if (body != null) {
@@ -88,7 +85,4 @@ function Job(url) {
 
 
 queue.Job = Job;
-//variable called status that can be queried and is updated
-//url variable
-
 module.exports = queue;

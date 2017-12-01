@@ -13,8 +13,6 @@ var port = process.env.PORT || 8080;
 
 // connect to our mongoDB database
 var MongoClient = require('mongodb').MongoClient;
-
-// Connect to the db
 var db;
 const JobsCollection = "JobCollection";
 MongoClient.connect("mongodb://localhost:27017/JobDatabase", function(err, database) {
@@ -26,7 +24,7 @@ MongoClient.connect("mongodb://localhost:27017/JobDatabase", function(err, datab
 })
 
 app.get('/', function(req, res){
-    res.send('hello world');
+    res.send('README for usage');
 });
 
 app.get('/addJob', function(req, res){
@@ -34,13 +32,12 @@ app.get('/addJob', function(req, res){
     var newJob = new JobQueue.Job(url);
     function callback(job) {
         if (job.status == statusEnum.finished) {
-            console.log(job.id)
             db.collection(JobsCollection).updateOne(
                 {"_id": job.id},
                 {$set: {"result": job.result, "status": job.status}}
             )
             .then(function (result) {
-                console.log("finished");
+                console.log();
             })
 
 
@@ -80,11 +77,12 @@ app.get('/checkResult', function(req,res){
         }
     ).then(function(row) {
         res.send(row.result)
+        console.log(row.result)
     })
 
 });
 
-console.log("redi to rumble!!!! on port " + port);
+console.log("ready to rumble on port " + port);
 app.listen(port);
 
 
