@@ -43,7 +43,7 @@ Additionally, in my code I currently use a GET request with query parameters to 
 A POST request better aligns with the nature of the function and uniform interface, but is not allowed if the user can only use browser URL bar for commands.
 My revisions here assume a client that can make all the different types of HTTP requests.
 
-===========================================================================================================================================
+=====================================================================
 
 NOTES:
 !- Program will not run without MongoDB database
